@@ -14,6 +14,7 @@ namespace SelExample
     public class TestGoogle : DriverSetup
     {
         private StringBuilder verificationErrors;
+        
 
         [SetUp]
         public void SetupTest()
@@ -35,14 +36,25 @@ namespace SelExample
             Assert.AreEqual("", verificationErrors.ToString()); //not sure what this does
         }
 
-        [TestCase("/", TestName = "TestHeaders")]
-        public void LoginTestRequired(string url)
+        public static IEnumerable<TestCaseData> LocatorsForGoogleHeaderLinkTests
         {
+            get
+            {
+                yield return new TestCaseData("/", Locators.HeaderAbout, "https://about.google/");
+                yield return new TestCaseData("/", Locators.HeaderStore, "https://store.google.com/US/");
+                yield return new TestCaseData("/", Locators.HeaderGmail, "https://www.google.com/gmail/about/");
+                //yield return new TestCaseData(report, report.Merchants[5461324658456716].AggregateTotals, 5461324658456716, "WirelessPerItem").SetName("ReportMerchantsAggregateTotals");
+            }
+        }
+        [TestCaseSource("LocatorsForGoogleHeaderLinkTests")]
+        public void GoogleHeaderLinkTests(string url, By byLoc, string expectedUrl)
+        {
+            
             driver.Navigate().GoToUrl(baseURL + url);
             Thread.Sleep(2000);
-            driver.FindElement(Locators.HeaderAbout).Click();
+            driver.FindElement(byLoc).Click();
             Thread.Sleep(2000);
-            Assert.That(driver.Url.Split('?')[0], Is.EqualTo("https://about.google/"));
+            Assert.That(driver.Url.Split('?')[0], Is.EqualTo(expectedUrl));
         }
     }
 }
